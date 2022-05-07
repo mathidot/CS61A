@@ -2,6 +2,7 @@
 
 import random
 from re import I
+from tkinter.tix import Tree
 from typing import Container
 from typing_extensions import assert_type
 from unicodedata import name
@@ -476,16 +477,18 @@ class QueenAnt(ScubaThrower):  # You should change this line
         """A queen ant throws a leaf, but also doubles the damage of ants
         in her tunnel.
         """
-
+        super().action(gamestate)
         place = self.place.exit
         while place is not None:
             if place.ant is not None:
-                if not place.ant.is_doubled:
-                    if place.ant.is_container:
-                        if place.ant.ant_contained is not None:
-                            place.ant.ant_contained.double()
-                    else:
+                if place.ant.is_container:
+                    if not place.ant.is_doubled:
                         place.ant.double()
+                    if place.ant.ant_contained is not None and not place.ant.ant_contained.is_doubled:
+                        place.ant.ant_contained.double()
+                else:
+                    if not place.ant.is_doubled:
+                        place.ant.double()   
             place = place.exit
         # END Problem 12
 
@@ -519,6 +522,9 @@ class Bee(Insect):
     name = 'Bee'
     damage = 1
     is_waterproof = True
+    is_scared = False
+    scared_times = 0
+    slowed_turns = 0
     # OVERRIDE CLASS ATTRIBUTES HERE
 
     def sting(self, ant):
@@ -549,7 +555,22 @@ class Bee(Insect):
         if self.blocked():
             self.sting(self.place.ant)
         elif self.health > 0 and destination is not None:
-            self.move_to(destination)
+            if self.slowed_turns > 0:
+                self.slowed_turns -= 1
+                if gamestate.time % 2 == 0:
+                    if self.scared_times > 0:
+                        if not self.place.entrance.is_hive:
+                            self.move_to(self.place.entrance)
+                        self.scared_times -= 1
+                    else:
+                        self.move_to(destination)
+            else:
+                if self.scared_times > 0:
+                    if not self.place.entrance.is_hive:
+                        self.move_to(self.place.entrance)
+                    self.scared_times -= 1
+                else:
+                    self.move_to(destination)
 
     def add_to(self, place):
         place.bees.append(self)
@@ -562,7 +583,7 @@ class Bee(Insect):
     def slow(self, length):
         """Slow the bee for a further LENGTH turns."""
         # BEGIN Problem EC
-        "*** YOUR CODE HERE ***"
+        self.slowed_turns += length
         # END Problem EC
 
     def scare(self, length):
@@ -571,7 +592,9 @@ class Bee(Insect):
         go backwards LENGTH times.
         """
         # BEGIN Problem EC
-        "*** YOUR CODE HERE ***"
+        if not self.is_scared:
+            self.is_scared = True
+            self.scared_times += length
         # END Problem EC
 
 
@@ -608,7 +631,7 @@ class SlowThrower(ThrowerAnt):
     name = 'Slow'
     food_cost = 4
     # BEGIN Problem EC
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC
 
     def throw_at(self, target):
@@ -622,12 +645,13 @@ class ScaryThrower(ThrowerAnt):
     name = 'Scary'
     food_cost = 6
     # BEGIN Problem EC
-    implemented = False   # Change to True to view in the GUI
+    implemented = True   # Change to True to view in the GUI
     # END Problem EC
 
     def throw_at(self, target):
         # BEGIN Problem EC
-        "*** YOUR CODE HERE ***"
+        if target:
+            target.scare(2)
         # END Problem EC
 
 
