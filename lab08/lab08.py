@@ -1,3 +1,7 @@
+from cgitb import small
+from numpy import flip, insert
+
+
 def repeated(t, k):
     """Return the first value in iterator T that appears K times in a row.
     Iterate through the items such that if the same iterator is passed into
@@ -180,7 +184,8 @@ def insert_into_all(item, nested_list):
     [[0], [0, 1, 2], [0, 3]]
     """
     "*** YOUR CODE HERE ***"
-
+    
+    return [[item] + lst for lst in nested_list]
 
 def subseqs(s):
     """Return a nested list (a list of lists) of all subsequences of S.
@@ -192,12 +197,12 @@ def subseqs(s):
     >>> subseqs([])
     [[]]
     """
-    if ________________:
-        ________________
+    if s == []:
+        return [[]]
     else:
-        ________________
-        ________________
-
+        sub_s = s[1:]
+        sub_sequence_s = subseqs(s[1:])
+        return insert_into_all(s[0],sub_sequence_s) + sub_sequence_s
 
 def non_decrease_subseqs(s):
     """Assuming that S is a list, return a nested list of all subsequences
@@ -215,14 +220,14 @@ def non_decrease_subseqs(s):
     """
     def subseq_helper(s, prev):
         if not s:
-            return ____________________
+            return [[]]
         elif s[0] < prev:
-            return ____________________
+            return subseq_helper(s[1:],prev)
         else:
-            a = ______________________
-            b = ______________________
-            return insert_into_all(________, ______________) + ________________
-    return subseq_helper(____, ____)
+            a = subseq_helper(s[1:],s[0])
+            b = subseq_helper(s[1:],s[1])
+            return insert_into_all(s[0],a) + b
+    return subseq_helper(s,0)
 
 
 def card(n):
@@ -251,11 +256,10 @@ def shuffle(cards):
     ['AH', 'AD', 'AS', 'AC', '2H', '2D', '2S', '2C', '3H', '3D', '3S', '3C']
     """
     assert len(cards) % 2 == 0, 'len(cards) must be even'
-    half = _______________
     shuffled = []
-    for i in _____________:
-        _________________
-        _________________
+    for i in range(len(cards) // 2):
+        shuffled.append(cards[i])
+        shuffled.append(cards[len(cards)//2 + i])
     return shuffled
 
 
@@ -278,6 +282,10 @@ def pairs(lst):
     """
     "*** YOUR CODE HERE ***"
 
+    for item1 in lst:
+        for item2 in lst:
+            yield (item1,item2)
+
 
 class PairsIterator:
     """
@@ -296,13 +304,16 @@ class PairsIterator:
     """
 
     def __init__(self, lst):
-        "*** YOUR CODE HERE ***"
+        self.lst = lst
 
     def __next__(self):
         "*** YOUR CODE HERE ***"
+        for x in self.lst:
+            for y in self.lst:
+                yield (x,y)
 
     def __iter__(self):
-        "*** YOUR CODE HERE ***"
+        yield from self.__next__()
 
 
 def long_paths(tree, n):
@@ -335,7 +346,16 @@ def long_paths(tree, n):
     [Link(0, Link(11, Link(12, Link(13, Link(14)))))]
     """
     "*** YOUR CODE HERE ***"
-
+    
+    paths = []
+    if tree.is_leaf() and n <= 0:
+        paths.append(Link(tree.label))
+    
+    for b in tree.branches:
+        for path in long_paths(b,n - 1):
+            paths.append(Link(tree.label,path))
+    return paths
+        
 
 def flip_two(s):
     """
@@ -349,6 +369,12 @@ def flip_two(s):
     Link(2, Link(1, Link(4, Link(3, Link(5)))))
     """
     "*** YOUR CODE HERE ***"
+    if s is Link.empty or s.rest is Link.empty:
+        return 
+    temp = s.first
+    s.first = s.rest.first
+    s.rest.first = temp
+    return flip_two(s.rest.rest)
 
     # For an extra challenge, try writing out an iterative approach as well below!
     "*** YOUR CODE HERE ***"
