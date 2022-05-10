@@ -2,6 +2,8 @@
 
 import random
 
+from nbformat import read
+
 
 class Card:
     cardtype = 'Staff'
@@ -88,7 +90,7 @@ class Player:
         self.deck = deck
         self.name = name
         # BEGIN Problem 2
-        "*** YOUR CODE HERE ***"
+        self.hand = [self.deck.draw() for _ in range(5)]
         # END Problem 2
 
     def draw(self):
@@ -104,7 +106,7 @@ class Player:
         """
         assert not self.deck.is_empty(), 'Deck is empty!'
         # BEGIN Problem 2
-        "*** YOUR CODE HERE ***"
+        self.hand.append(self.deck.draw())
         # END Problem 2
 
     def play(self, index):
@@ -123,6 +125,7 @@ class Player:
         """
         # BEGIN Problem 2
         "*** YOUR CODE HERE ***"
+        return self.hand.pop(index)
         # END Problem 2
 
     def display_hand(self):
@@ -163,6 +166,8 @@ class AICard(Card):
         """
         # BEGIN Problem 3
         "*** YOUR CODE HERE ***"
+        for i in range(2):
+            player.draw()
         # END Problem 3
         # You should add your implementation above this.
         print(f"{self.name} allows me to draw two cards!")
@@ -206,6 +211,9 @@ class TutorCard(Card):
         """
         # BEGIN Problem 4
         added = None
+        if player.hand != []:
+            added = player.hand[0].copy()
+            player.hand.append(added)
         # END Problem 4
         # You should add your implementation above this.
         if added:
@@ -216,6 +224,9 @@ class TutorCard(Card):
         Create a copy of this card.
         """
         return TutorCard(self.name, self.attack, self.defense)
+    
+    def power(self, opponent_card):
+        return -float('inf')
 
 
 class TACard(Card):
@@ -245,6 +256,12 @@ class TACard(Card):
         """
         # BEGIN Problem 5
         best_card = None
+        if player.hand != []:
+            best_card = max(player.hand,key=lambda x: x.power(opponent_card))
+            best_card_index = player.hand.index(best_card)
+            self.attack += best_card.attack
+            self.defense += best_card.defense
+            player.hand.pop(best_card_index)
         # END Problem 5
         if best_card:
             print(f"{self.name} discards {best_card.name} from my hand to increase its own power!")
@@ -284,6 +301,12 @@ class InstructorCard(Card):
         """
         # BEGIN Problem 6
         readd = None
+        self.attack -= 1000
+        self.defense -= 1000
+        if self.attack >=0 and self.defense >= 0:
+            readd = self.copy()
+            player.hand.append(readd)
+
         # END Problem 6
         # You should add your implementation above this.
         if readd:
