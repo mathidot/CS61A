@@ -103,8 +103,12 @@ class Buffer:
             try:
                 yield next(tokens)
             except StopIteration:
-                tokens = iter(next(lines))
-                yield EOL_TOKEN
+                try:
+                    tokens = iter(next(lines))
+                    yield EOL_TOKEN
+                except StopIteration:
+                    yield EOL_TOKEN
+                    break
         # END
 
     def pop_first(self):
@@ -116,10 +120,7 @@ class Buffer:
         # BEGIN
         "*** YOUR CODE HERE ***"
         ret = self.current
-        try:
-            self.current = next(self.generator)
-        except StopIteration:
-            self.current = None
+        self.current = next(self.generator,None)
         return ret
         # END
 
