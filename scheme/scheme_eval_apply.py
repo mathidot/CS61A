@@ -1,3 +1,4 @@
+from ast import arg
 import sys
 
 from pair import *
@@ -35,6 +36,9 @@ def scheme_eval(expr, env, _=None):  # Optional third argument is ignored
     else:
         # BEGIN PROBLEM 3
         "*** YOUR CODE HERE ***"
+        procedure = scheme_eval(expr.first,env)
+        args = expr.rest.map(lambda operand: scheme_eval(operand,env))
+        return scheme_apply(procedure,args,env)
         # END PROBLEM 3
 
 
@@ -45,6 +49,18 @@ def scheme_apply(procedure, args, env):
     if isinstance(procedure, BuiltinProcedure):
         # BEGIN PROBLEM 2
         "*** YOUR CODE HERE ***"
+        def unroll_args(args):
+            if args == nil:
+                return []
+            else:
+                return [args.first] + unroll_args(args.rest)
+        args_list = unroll_args(args)
+        if procedure.expect_env:
+            args_list.append(env)
+        try:
+            return procedure.py_func(*args_list)
+        except TypeError:
+            raise SchemeError("incorrect number of arguments")
         # END PROBLEM 2
     elif isinstance(procedure, LambdaProcedure):
         # BEGIN PROBLEM 9
