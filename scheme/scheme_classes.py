@@ -60,6 +60,13 @@ class Frame:
             raise SchemeError('Incorrect number of arguments to function call')
         # BEGIN PROBLEM 8
         "*** YOUR CODE HERE ***"
+        if len(formals) != len(vals):
+            raise SchemeError('The number of argument values does not match with the number of formal parameters')
+        new_frame = Frame(self)
+        while formals != nil and vals != nil:
+            new_frame.define(formals.first,vals.first)
+            formals, vals = formals.rest, vals.rest 
+        return new_frame
         # END PROBLEM 8
 
 ##############
