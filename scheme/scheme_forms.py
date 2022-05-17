@@ -229,16 +229,6 @@ def make_let_frame(bindings, env):
     names = vals = nil
     # BEGIN PROBLEM 14
     "*** YOUR CODE HERE ***"
-    # binding_pointer = bindings
-    # while binding_pointer != nil:
-    #     validate_form(binding_pointer.first,2,2)
-    #     validate_formals(binding_pointer.first.first)
-    #     names = Pair(binding_pointer.first.first,names)
-    #     if scheme_numberp(binding_pointer.first.rest.first):
-    #         vals = Pair(binding_pointer.first.rest.first,vals)
-    #     else:
-    #         vals = Pair(env.lookup(binding_pointer.first.first),vals)
-    #     binding_pointer = binding_pointer.rest
 
     binding_pointer = bindings
     while binding_pointer is not nil:
