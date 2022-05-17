@@ -1,3 +1,4 @@
+from pickle import BINGET
 from scheme_eval_apply import *
 from scheme_utils import *
 from scheme_classes import *
@@ -135,7 +136,17 @@ def do_and_form(expressions, env):
     False
     """
     # BEGIN PROBLEM 12
-    "*** YOUR CODE HERE ***"
+    "*** YOUR CODE HERE ***"    
+    if expressions == nil:
+        return True 
+    first_value = scheme_eval(expressions.first,env)
+    if is_scheme_false(first_value):
+        return False
+    elif expressions.rest == nil:
+        return first_value
+    else:
+        return do_and_form(expressions.rest,env)
+
     # END PROBLEM 12
 
 
@@ -155,6 +166,16 @@ def do_or_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    if expressions == nil:
+        return False
+    first_value = scheme_eval(expressions.first,env)
+    if is_scheme_true(first_value):
+        return first_value 
+    elif expressions.rest == nil:
+        return first_value
+    else:
+        return do_or_form(expressions.rest,env)
+
     # END PROBLEM 12
 
 
@@ -176,6 +197,12 @@ def do_cond_form(expressions, env):
         if is_scheme_true(test):
             # BEGIN PROBLEM 13
             "*** YOUR CODE HERE ***"
+            if clause.first == 'else':
+                return eval_all(clause.rest,env)
+            elif clause.rest == nil:
+                return test
+            else:
+                return eval_all(clause.rest,env)
             # END PROBLEM 13
         expressions = expressions.rest
 
@@ -202,6 +229,16 @@ def make_let_frame(bindings, env):
     names = vals = nil
     # BEGIN PROBLEM 14
     "*** YOUR CODE HERE ***"
+    binding_pointer = bindings
+    while binding_pointer != nil:
+        validate_form(binding_pointer.first,2,2)
+        validate_formals(binding_pointer.first.first)
+        names = Pair(binding_pointer.first.first,names)
+        if scheme_numberp(binding_pointer.first.rest.first):
+            vals = Pair(binding_pointer.first.rest.first,vals)
+        else:
+            vals = Pair(env.lookup(binding_pointer.first.first),vals)
+        binding_pointer = binding_pointer.rest
     # END PROBLEM 14
     return env.make_child_frame(names, vals)
 
