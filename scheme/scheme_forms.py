@@ -1,4 +1,5 @@
 from pickle import BINGET
+from tokenize import Triple
 from scheme_eval_apply import *
 from scheme_utils import *
 from scheme_classes import *
@@ -116,9 +117,9 @@ def do_if_form(expressions, env):
     """
     validate_form(expressions, 2, 3)
     if is_scheme_true(scheme_eval(expressions.first, env)):
-        return scheme_eval(expressions.rest.first, env)
+        return scheme_eval(expressions.rest.first, env, True)
     elif len(expressions) == 3:
-        return scheme_eval(expressions.rest.rest.first, env)
+        return scheme_eval(expressions.rest.rest.first, env,True)
 
 
 def do_and_form(expressions, env):
@@ -146,7 +147,6 @@ def do_and_form(expressions, env):
         return first_value
     else:
         return do_and_form(expressions.rest,env)
-
     # END PROBLEM 12
 
 
