@@ -12,26 +12,34 @@
     (cadr kwlist))
 
 (define (make-kwlist2 keys values)
-  (if (null? (cdr keys))
-       (cons (cons (car keys) (cons (car values) nil)) nil)
-       (cons (cons (car keys) (cons (car values) nil)) (cons (make-kwlist2 (cdr keys) (cdr values)) nil))))
+  (if (null? keys)
+      '()
+      (cons (cons (car keys) (cons (car values) nil)) (make-kwlist2 (cdr keys) (cdr values)))))
 
-(define (get-keys-kwlist2 kwlist) 'YOUR-CODE-HERE)
+(define (get-keys-kwlist2 kwlist) 
+    (if (null? kwlist)
+        '()
+        (cons (car (car kwlist)) (get-keys-kwlist2 (cdr kwlist)))))
 
 (define (get-values-kwlist2 kwlist)
-  'YOUR-CODE-HERE)
+    (if (null? kwlist)
+        '()
+        (cons (car(cdr (car kwlist))) (get-values-kwlist2 (cdr kwlist)))))
+    
 
 (define (add-to-kwlist kwlist key value)
-  'YOUR-CODE-HERE)
+    '1)
 
 (define (get-first-from-kwlist kwlist key)
   'YOUR-CODE-HERE)
 
-(define (prune-expr expr)
-  (define (prune-helper lst) 'YOUR-CODE-HERE)
-  'YOUR-CODE-HERE)
+(define (prune-expr expr)   'YOUR-CODE-HERE)
 
-(define (curry-cook formals body) 'YOUR-CODE-HERE)
+(define (curry-cook formals body)
+    (define (curry-cook-helper temp-formals f)
+        (if (null? temp-formals)
+            f
+            (curry-consume)))
 
 (define (curry-consume curries args)
   'YOUR-CODE-HERE)
