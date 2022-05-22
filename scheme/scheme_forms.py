@@ -1,3 +1,4 @@
+from ast import expr
 from pickle import BINGET
 from tokenize import Triple
 from scheme_eval_apply import *
@@ -140,13 +141,14 @@ def do_and_form(expressions, env):
     "*** YOUR CODE HERE ***"    
     if expressions == nil:
         return True 
-    first_value = scheme_eval(expressions.first,env)
-    if is_scheme_false(first_value):
-        return False
-    elif expressions.rest == nil:
-        return first_value
+    elif expressions.rest is nil: #Tail context
+        return scheme_eval(expressions.first,env,True)
     else:
-        return do_and_form(expressions.rest,env)
+        first_expr = scheme_eval(expressions.first,env)
+        if is_scheme_false(first_expr):
+            return False
+        elif is_scheme_true(first_expr):
+            return do_and_form(expressions.rest,env)
     # END PROBLEM 12
 
 
@@ -166,15 +168,16 @@ def do_or_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
-    if expressions == nil:
+    if expressions is nil:
         return False
-    first_value = scheme_eval(expressions.first,env)
-    if is_scheme_true(first_value):
-        return first_value 
-    elif expressions.rest == nil:
-        return first_value
+    elif expressions.rest is nil:  # Tail context
+        return scheme_eval(expressions.first, env, True)
     else:
-        return do_or_form(expressions.rest,env)
+        first_expr = scheme_eval(expressions.first, env)
+        if is_scheme_false(first_expr):  # The first expression is False
+            return do_or_form(expressions.rest, env)
+        else:  # The first expression is True
+            return first_expr
 
     # END PROBLEM 12
 
