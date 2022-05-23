@@ -1,19 +1,17 @@
 ?start: link
 
-link: "Link(" NUMBER ")" | link_first link_rest
-?link_first: "Link("
-?link_rest: NUMBER "," link* ")" | link* ")"
+link: "Link(" NUMBER ")" | link_first link_rest | "Link(" link ")"
+?link_first: "Link(" NUMBER
+?link_rest:  "," link* ")" 
 
 %ignore /\s+/
 %import common.NUMBER
 
+tree_node: "Tree(" NUMBER ")" | "Tree(" label ", " branches ")"
 
-tree_node: "null"
+?label:  NUMBER 
 
-
-?label: "null"
-
-branches: "null"
+branches: "[" (tree_node ", ")* tree_node "]" 
 
 %ignore /\s+/
 %import common.NUMBER
@@ -21,9 +19,16 @@ branches: "null"
 
 rstring: "r\"" regex* "\""
 
-?regex: character | word
+?regex: character | word | group | pipe | range | classes
+group: "(" regex ")"
+pipe: regex "|" regex
+
+range: (NUMBER "-" NUMBER) | (LETTER "-" LETTER)
+class: "[" (character* range*)* "]"
+?classes: range | class
 
 character: LETTER | NUMBER
+
 word: WORD
 
 %ignore /\s+/
