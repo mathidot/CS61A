@@ -22,7 +22,10 @@
 ; Returns #t if t is a leaf, #f otherwise
 (define (is-leaf t) (null? (branches t)))
 
-(define (filter-odd t) 'YOUR-CODE-HERE)
+(define (filter-odd t) 
+    (if (even? (label t)) 
+        (tree nil (map filter-odd (branches t)))
+        (tree (label t) (map filter-odd (branches t)))))
 
 (define (cddr s) (cdr (cdr s)))
 
@@ -30,4 +33,8 @@
 
 (define (caddr s) (car (cddr s)))
 
-(define (swap expr) 'YOUR-CODE-HERE)
+(define (swap expr)
+    (let ((x (eval (cadr expr))) (y (eval (caddr expr))))
+        (if (< x y)
+        (cons (car expr) (cons (caddr expr) (cons (cadr expr) (cdr (cddr expr)))))
+        expr)))

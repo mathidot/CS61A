@@ -1,4 +1,7 @@
+from hashlib import new
 import re
+
+from numpy import empty
 
 
 def address_oneline(text):
@@ -19,10 +22,10 @@ def address_oneline(text):
     >>> address_oneline("790 lowercase St")
     False
     """
-    block_number = r'___'
-    cardinal_dir = r'___'  # whitespace is important!
-    street = r'___'
-    type_abbr = r'___'
+    block_number = r'\d{3,5}'
+    cardinal_dir = r'(?:[NWES] )?'  # whitespace is important!
+    street = r'(?:[A-Z][A-Za-z]+ )+'
+    type_abbr = r'(?:[A-Z][a-z]{1,4}\b)'
     street_name = f"{cardinal_dir}{street}{type_abbr}"
     return bool(re.search(f"{block_number} {street_name}", text))
 
@@ -82,6 +85,20 @@ def add_trees(t1, t2):
       5
     """
     "*** YOUR CODE HERE ***"
+    if t1.is_leaf():
+        return Tree(t1.label + t2.label, t2.branches)
+    elif t2.is_leaf():
+        return Tree(t1.label + t2.label, t1.branches)
+    else:
+        new_branches = []
+        for branch1, branch2 in list(zip(t1.branches,t2.branches)):
+            new_branches.append(add_trees(branch1,branch2))
+        if len(new_branches) < len(t1.branches):
+            new_branches += t1.branches[len(new_branches):]
+        if len(new_branches) < len(t2.branches):
+            new_branches += t2.branches[len(new_branches):]
+        return Tree(t1.label + t2.label,new_branches)
+    
 
 
 def make_test_random():
@@ -141,13 +158,26 @@ class Player:
         self.popularity = 100
 
     def debate(self, other):
-        "*** YOUR CODE HERE ***"
+        p1 = self.popularity
+        p2 = other.popularity
+        prob = max(0.1, p1 / (p1 + p2))
+        r = random()
+        if r < prob:
+            self.popularity  = p1 + 50
+        else:
+            self.popularity = max(0, p1-50)
 
     def speech(self, other):
-        "*** YOUR CODE HERE ***"
+        p1 = self.popularity
+        p2 = other.popularity
+        self.popularity += p1 // 10
+        self.votes += p1 // 10
+        other.popularity = max(0, p2 - p2 // 10)
 
     def choose(self, other):
         return self.speech
+
+
 
 
 # Phase 2: The Game Class
@@ -161,21 +191,23 @@ class Game:
 
     """
 
-    def __init__(self, player1, player2):
-        self.p1 = player1
-        self.p2 = player2
-        self.turn = 0
-
     def play(self):
-        while not self.game_over():
-            "*** YOUR CODE HERE ***"
-        return self.winner()
+        while not self.game_over:
+            if self.turn == 0:
+                player, other = self.p1, self.p2
+            else:
+                player, other = self.p2, self.p1
+            player.choose(other)(other)
+            self.turn = 1 - self.turn
+        return self.winner
 
+    @property
     def game_over(self):
         return max(self.p1.votes, self.p2.votes) >= 50 or self.turn >= 10
 
+    @property
     def winner(self):
-        "*** YOUR CODE HERE ***"
+        return self.p1 if self.p1.votes > self.p2.votes else self.p2
 
 
 # Phase 3: New Players
@@ -192,6 +224,7 @@ class AggressivePlayer(Player):
 
     def choose(self, other):
         "*** YOUR CODE HERE ***"
+        return self.debate if self.popularity <= other.popularity else self.speech
 
 
 class CautiousPlayer(Player):
@@ -208,7 +241,7 @@ class CautiousPlayer(Player):
     """
 
     def choose(self, other):
-        "*** YOUR CODE HERE ***"
+        return self.debate if self.popularity == 0 else self.speech
 
 
 def intersection(lst_of_lsts):
@@ -248,7 +281,7 @@ def deck(suits, ranks):
     []
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    return [[suit,rank] for suit in suits for rank in ranks]
 
 
 def pascal_row(s):
@@ -264,7 +297,12 @@ def pascal_row(s):
     <1 4 6 4 1>
     """
     "*** YOUR CODE HERE ***"
-
+    if s is Link.empty:
+        return Link(1)
+    elif s == Link(1):
+        return Link(1,Link(1,Link.empty))
+    else:
+        pass
 
 class Tree:
     """
