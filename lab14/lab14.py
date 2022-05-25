@@ -261,10 +261,21 @@ def intersection(lst_of_lsts):
     >>> intersection(lsts4)         # Return list of distinct elements
     [3]
     """
-    elements = []
-    "*** YOUR CODE HERE ***"
-    return elements
 
+    "*** YOUR CODE HERE ***"
+    elements = []
+    lst_sets = []
+    for lst in lst_of_lsts:
+        temp_set = set()
+        for e in lst:
+            temp_set.add(e)
+        lst_sets.append(temp_set)
+    common_set = lst_sets[0]
+    for s in lst_sets:
+        common_set &=  s
+    for e in common_set:
+        elements.append(e)
+    return elements
 
 def deck(suits, ranks):
     """Creates a deck of cards (a list of 2-element lists) with the given
@@ -298,11 +309,17 @@ def pascal_row(s):
     """
     "*** YOUR CODE HERE ***"
     if s is Link.empty:
-        return Link(1)
-    elif s == Link(1):
+        return Link(1,Link.empty)
+    elif s.rest is Link.empty:
         return Link(1,Link(1,Link.empty))
     else:
-        pass
+        ret = Link(1)
+        while s.rest is not Link.empty:
+            ret = Link(s.first + s.rest.first,ret)
+            s = s.rest
+        ret = Link(1,ret)
+        return ret
+
 
 class Tree:
     """
